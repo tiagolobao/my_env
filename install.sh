@@ -64,9 +64,14 @@ echo "=== Installing Bash aliases ==="
 create_symlink "$SCRIPT_DIR/bash/.bash_aliases" "$HOME/.bash_aliases"
 
 # Install Aider configuration
+# echo ""
+# echo "=== Installing Aider configuration ==="
+# create_symlink "$SCRIPT_DIR/.aider.conf.yml" "$HOME/.aider.conf.yml"
+
+# Install Git configuration
 echo ""
-echo "=== Installing Aider configuration ==="
-create_symlink "$SCRIPT_DIR/.aider.conf.yml" "$HOME/.aider.conf.yml"
+echo "=== Installing Git configuration ==="
+create_symlink "$SCRIPT_DIR/git/.gitconfig" "$HOME/.gitconfig"
 
 # Source bash aliases in .bashrc if not already present
 echo ""
