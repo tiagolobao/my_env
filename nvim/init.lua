@@ -12,7 +12,6 @@ vim.opt.mouse = "a"
 vim.opt.tabstop = 4
 vim.opt.shiftwidth = 4
 vim.opt.expandtab = true
-vim.opt.smartindent = true
 
 -- Search settings
 vim.opt.ignorecase = true
@@ -26,9 +25,8 @@ vim.opt.wrap = false
 -- Enable 24-bit RGB color
 vim.opt.termguicolors = true
 
--- Better split behavior
+-- Split to the right instead of below
 vim.opt.splitright = true
-vim.opt.splitbelow = true
 
 -- Persistent undo
 vim.opt.undofile = true
@@ -40,19 +38,9 @@ vim.opt.signcolumn = "yes"
 -- Set completeopt for better autocomplete
 vim.opt.completeopt = "menuone,noselect"
 
--- Key mappings
-local keymap = vim.keymap.set
-
 -- Plugins (using lazy.vim)
 -- For plugin list, check ~/.config/nvim/lua/config/lazy.lua
 require("config.lazy")
-
-require('lualine').setup{
-    options = { 
-        theme = 'horizon',
-        icons_enabled = true,
-    }
-}
 
 vim.api.nvim_create_autocmd('FileType', {
     pattern = { 'rust', 'c', 'cpp', 'lua', 'python' },
