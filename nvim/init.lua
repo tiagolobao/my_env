@@ -1,6 +1,9 @@
 -- Neovim basic configuration
 -- This is a minimal setup for a productive editing experience
 
+-- Nerd font is installed
+vim.g.have_nerd_font = true
+
 -- Enable line numbers
 vim.opt.number = true
 vim.opt.relativenumber = true
@@ -37,6 +40,10 @@ vim.opt.signcolumn = "yes"
 
 -- Set completeopt for better autocomplete
 vim.opt.completeopt = "menuone,noselect"
+
+-- cursor improvements
+vim.o.scrolloff = 10
+vim.o.cursorline = true
 
 -- Plugins (using lazy.vim)
 -- For plugin list, check ~/.config/nvim/lua/config/lazy.lua

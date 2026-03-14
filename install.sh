@@ -3,6 +3,8 @@
 # Development Environment Configuration Installer
 # This script sets up configuration files for tmux, Neovim, Kitty, and Bash
 
+BACKUP_ENABLED=false
+
 set -e
 
 echo "Starting installation of development environment configurations..."
@@ -10,7 +12,13 @@ echo "Starting installation of development environment configurations..."
 # Store current directory
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-# Function to create backup of existing file
+show_help() {
+    echo "Usage: $0 [OPTIONS]"
+    echo "Options:"
+    echo "  --backup    Enable backup mode"
+    echo "  --help      Show this help message"
+}
+
 backup_file() {
     local file="$1"
     if [ -e "$file" ]; then
@@ -20,7 +28,6 @@ backup_file() {
     fi
 }
 
-# Function to create symlink
 create_symlink() {
     local source="$1"
     local target="$2"
@@ -30,7 +37,9 @@ create_symlink() {
         return 1
     fi
     
-    backup_file "$target"
+    if [ "$BACKUP_ENABLED" = true ]; then
+        backup_file "$target"
+    fi
     
     # Create parent directory if it doesn't exist
     mkdir -p "$(dirname "$target")"
@@ -43,10 +52,31 @@ create_symlink() {
     echo "Created symlink: $target -> $source"
 }
 
+# Parse arguments
+while [ $# -gt 0 ]; do
+    case "$1" in
+        --backup)
+            BACKUP_ENABLED=true
+            shift
+            ;;
+        --help)
+            show_help
+            exit 0
+            ;;
+        *)
+            echo "Unknown option: $1"
+            show_help
+            exit 1
+            ;;
+    esac
+done
+
 # Install tmux configuration
+# Note: no plugin manager included
 echo ""
 echo "=== Installing tmux configuration ==="
 create_symlink "$SCRIPT_DIR/tmux/.tmux.conf" "$HOME/.tmux.conf"
+create_symlink "$SCRIPT_DIR/tmux/plugins" "$HOME/.config/tmux/plugins"
 
 # Install Neovim configuration
 echo ""
