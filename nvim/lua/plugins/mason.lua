@@ -1,11 +1,13 @@
 -- ~/.config/nvim/lua/plugins/mason.lua
--- Mason: package manager for LSP servers, linters, formatters
+-- Mason v2: package manager for LSP servers, linters, formatters.
+-- automatic_enable = true tells mason-lspconfig to call vim.lsp.enable()
+-- for every installed server automatically (Mason-LSPConfig v2 API).
 
 return {
   {
     'mason-org/mason.nvim',
     lazy = false,
-    priority = 100, -- load before mason-lspconfig
+    priority = 100,
     opts = {
       ui = {
         icons = {
@@ -20,18 +22,15 @@ return {
   {
     'mason-org/mason-lspconfig.nvim',
     lazy = false,
-    dependencies = {
-      'mason-org/mason.nvim',
-      'neovim/nvim-lspconfig',
-    },
+    dependencies = { 'mason-org/mason.nvim' },
     opts = {
-      -- Automatically install these servers if not present
       ensure_installed = {
         'lua_ls',
         'rust_analyzer',
-        'ts_ls',       -- TypeScript / JavaScript / React (TSX/JSX)
+        'ts_ls',   -- TypeScript / JavaScript / React (TSX / JSX)
       },
-      automatic_installation = true,
+      -- Mason-LSPConfig v2: calls vim.lsp.enable() for every installed server.
+      automatic_enable = true,
     },
   },
 }

@@ -38,27 +38,32 @@ vim.opt.undodir = vim.fn.stdpath("data") .. "/undo"
 -- Keep signcolumn always visible
 vim.opt.signcolumn = "yes"
 
--- Set completeopt for better autocomplete
-vim.opt.completeopt = "menuone,noselect"
+-- Native insert-mode autocompletion (Neovim 0.12+)
+vim.opt.completeopt = "menuone,noselect,popup"
+vim.opt.autocomplete = true
 
 -- cursor improvements
 vim.o.scrolloff = 10
 vim.o.cursorline = true
 
--- Plugins (using lazy.vim)
+-- Plugins (using lazy.nvim)
 -- For plugin list, check ~/.config/nvim/lua/config/lazy.lua
 require("config.lazy")
 
+-- Activate treesitter for supported filetypes.
+-- In Neovim 0.12 highlight is a built-in default; we call vim.treesitter.start()
+-- explicitly here only to also enable indentation via nvim-treesitter.
 vim.api.nvim_create_autocmd('FileType', {
-    pattern = { 'rust', 'c', 'cpp', 'lua', 'python' },
+    pattern = {
+      -- systems / scripting
+      'rust', 'c', 'cpp', 'lua', 'python',
+      -- web / JS / TS / React
+      'javascript', 'javascriptreact',
+      'typescript', 'typescriptreact',
+      'html', 'css', 'json',
+    },
     callback = function()
-      -- syntax highlighting, provided by Neovim
       vim.treesitter.start()
-      -- folds, provided by Neovim
-      -- vim.wo.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
-      -- vim.wo.foldmethod = 'expr'
-      -- indentation, provided by nvim-treesitter
       vim.bo.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
     end,
   })
-

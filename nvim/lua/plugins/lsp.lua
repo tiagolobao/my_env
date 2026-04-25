@@ -1,90 +1,91 @@
 -- ~/.config/nvim/lua/plugins/lsp.lua
+-- Neovim 0.12+: native vim.lsp.config() API replaces nvim-lspconfig.
+-- Mason v2 + mason-lspconfig with automatic_enable = true starts servers
+-- automatically; no setup_handlers() needed.
 
 return {
+  -- nvim-lspconfig is kept for its bundled server definitions (cmd, root_markers,
+  -- filetypes), but we no longer call lspconfig[server].setup().
   'neovim/nvim-lspconfig',
   lazy = false,
   dependencies = {
-    'hrsh7th/nvim-cmp',             -- autocompletion engine
-    'hrsh7th/cmp-nvim-lsp',         -- LSP completion source
     'mason-org/mason.nvim',
     'mason-org/mason-lspconfig.nvim',
   },
   config = function()
-    local lspconfig       = require('lspconfig')
-    local mason_lspconfig = require('mason-lspconfig')
 
-    -- Extend default capabilities with nvim-cmp completion support
-    local capabilities = require('cmp_nvim_lsp').default_capabilities()
-
-    -- Default handler: called for every server managed by mason-lspconfig
-    mason_lspconfig.setup_handlers({
-      function(server_name)
-        lspconfig[server_name].setup({
-          capabilities = capabilities,
-        })
-      end,
-
-      -- Per-server overrides --------------------------------------------------
-
-      ['lua_ls'] = function()
-        lspconfig.lua_ls.setup({
-          capabilities = capabilities,
-          settings = {
-            Lua = {
-              diagnostics = { globals = { 'vim' } }, -- suppress 'vim' undefined warnings
-              workspace   = { checkThirdParty = false },
-              telemetry   = { enable = false },
-            },
-          },
-        })
-      end,
-
-      ['ts_ls'] = function()
-        lspconfig.ts_ls.setup({
-          capabilities = capabilities,
-          -- Activate for JS/TS/JSX/TSX files
-          filetypes = {
-            'javascript',
-            'javascriptreact',
-            'javascript.jsx',
-            'typescript',
-            'typescriptreact',
-            'typescript.tsx',
-          },
-          settings = {
-            typescript = {
-              inlayHints = {
-                includeInlayParameterNameHints         = 'all',
-                includeInlayParameterNameHintsWhenArgumentMatchesName = false,
-                includeInlayFunctionParameterTypeHints = true,
-                includeInlayVariableTypeHints          = true,
-                includeInlayPropertyDeclarationTypeHints = true,
-                includeInlayFunctionLikeReturnTypeHints  = true,
-                includeInlayEnumMemberValueHints        = true,
-              },
-            },
-            javascript = {
-              inlayHints = {
-                includeInlayParameterNameHints         = 'all',
-                includeInlayParameterNameHintsWhenArgumentMatchesName = false,
-                includeInlayFunctionParameterTypeHints = true,
-                includeInlayVariableTypeHints          = true,
-                includeInlayPropertyDeclarationTypeHints = true,
-                includeInlayFunctionLikeReturnTypeHints  = true,
-                includeInlayEnumMemberValueHints        = true,
-              },
-            },
-          },
-        })
-      end,
+    -- Global defaults applied to every LSP client --------------------------
+    vim.lsp.config('*', {
+      capabilities = vim.lsp.protocol.make_client_capabilities(),
     })
 
-    -- Keymap to toggle inlay hints (works for any LSP)
+    -- Lua ------------------------------------------------------------------
+    vim.lsp.config('lua_ls', {
+      settings = {
+        Lua = {
+          runtime     = { version = 'LuaJIT' },
+          diagnostics = { globals = { 'vim' } },
+          workspace   = {
+            library      = vim.api.nvim_get_runtime_file('', true),
+            checkThirdParty = false,
+          },
+          telemetry = { enable = false },
+        },
+      },
+    })
+
+    -- TypeScript / JavaScript / React (ts_ls) ------------------------------
+    vim.lsp.config('ts_ls', {
+      filetypes = {
+        'javascript',
+        'javascriptreact',
+        'javascript.jsx',
+        'typescript',
+        'typescriptreact',
+        'typescript.tsx',
+      },
+      settings = {
+        typescript = {
+          inlayHints = {
+            includeInlayParameterNameHints                          = 'all',
+            includeInlayParameterNameHintsWhenArgumentMatchesName   = false,
+            includeInlayFunctionParameterTypeHints                  = true,
+            includeInlayVariableTypeHints                           = true,
+            includeInlayPropertyDeclarationTypeHints                = true,
+            includeInlayFunctionLikeReturnTypeHints                 = true,
+            includeInlayEnumMemberValueHints                        = true,
+          },
+        },
+        javascript = {
+          inlayHints = {
+            includeInlayParameterNameHints                          = 'all',
+            includeInlayParameterNameHintsWhenArgumentMatchesName   = false,
+            includeInlayFunctionParameterTypeHints                  = true,
+            includeInlayVariableTypeHints                           = true,
+            includeInlayPropertyDeclarationTypeHints                = true,
+            includeInlayFunctionLikeReturnTypeHints                 = true,
+            includeInlayEnumMemberValueHints                        = true,
+          },
+        },
+      },
+    })
+
+    -- Keymap: toggle inlay hints for the current buffer --------------------
     vim.keymap.set('n', 'gh', function()
       vim.lsp.inlay_hint.enable(
         not vim.lsp.inlay_hint.is_enabled({ bufnr = 0 }),
         { bufnr = 0 }
       )
     end, { desc = 'Toggle Inlay Hints' })
+
+    -- Native insert-mode completion (Neovim 0.12 built-in) -----------------
+    vim.api.nvim_create_autocmd('LspAttach', {
+      callback = function(ev)
+        local client = vim.lsp.get_client_by_id(ev.data.client_id)
+        if client and client:supports_method('textDocument/completion') then
+          vim.lsp.completion.enable(true, client.id, ev.buf, { autotrigger = true })
+        end
+      end,
+    })
   end,
 }
