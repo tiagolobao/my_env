@@ -50,9 +50,15 @@ vim.o.cursorline = true
 -- For plugin list, check ~/.config/nvim/lua/config/lazy.lua
 require("config.lazy")
 
+-- Explicitly map Neovim filetypes to their treesitter parser names.
+-- Neovim uses 'typescriptreact' as the filetype for .tsx files, but
+-- the treesitter parser is called 'tsx'. Same story for .jsx files.
+vim.treesitter.language.register('tsx',        'typescriptreact')
+vim.treesitter.language.register('javascript', 'javascriptreact')
+
 -- Activate treesitter for supported filetypes.
--- In Neovim 0.12 highlight is a built-in default; we call vim.treesitter.start()
--- explicitly here only to also enable indentation via nvim-treesitter.
+-- Wrapped in pcall so that a missing parser (e.g. before the first
+-- :TSUpdate has finished) never crashes startup with an error.
 vim.api.nvim_create_autocmd('FileType', {
     pattern = {
       -- systems / scripting
@@ -63,7 +69,14 @@ vim.api.nvim_create_autocmd('FileType', {
       'html', 'css', 'json',
     },
     callback = function()
-      vim.treesitter.start()
+      local ok, err = pcall(vim.treesitter.start)
+      if not ok then
+        vim.notify(
+          'treesitter parser not yet installed for this filetype: ' .. err,
+          vim.log.levels.DEBUG
+        )
+        return
+      end
       vim.bo.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
     end,
   })
