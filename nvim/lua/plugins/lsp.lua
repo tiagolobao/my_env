@@ -36,13 +36,17 @@ return {
 
     -- TypeScript / JavaScript / React (ts_ls) ------------------------------
     vim.lsp.config('ts_ls', {
+      -- These are the correct Neovim filetype names:
+      --   javascript      -> .js files
+      --   javascriptreact -> .jsx files
+      --   typescript      -> .ts files
+      --   typescriptreact -> .tsx files
+      -- (javascript.jsx and typescript.tsx are NOT valid Neovim filetypes)
       filetypes = {
         'javascript',
         'javascriptreact',
-        'javascript.jsx',
         'typescript',
         'typescriptreact',
-        'typescript.tsx',
       },
       settings = {
         typescript = {
