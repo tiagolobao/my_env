@@ -38,27 +38,45 @@ vim.opt.undodir = vim.fn.stdpath("data") .. "/undo"
 -- Keep signcolumn always visible
 vim.opt.signcolumn = "yes"
 
--- Set completeopt for better autocomplete
-vim.opt.completeopt = "menuone,noselect"
+-- Native insert-mode autocompletion (Neovim 0.12+)
+vim.opt.completeopt = "menuone,noselect,popup"
+vim.opt.autocomplete = true
 
 -- cursor improvements
 vim.o.scrolloff = 10
 vim.o.cursorline = true
 
--- Plugins (using lazy.vim)
+-- Plugins (using lazy.nvim)
 -- For plugin list, check ~/.config/nvim/lua/config/lazy.lua
 require("config.lazy")
 
+-- Explicitly map Neovim filetypes to their treesitter parser names.
+-- Neovim uses 'typescriptreact' as the filetype for .tsx files, but
+-- the treesitter parser is called 'tsx'. Same story for .jsx files.
+vim.treesitter.language.register('tsx',        'typescriptreact')
+vim.treesitter.language.register('javascript', 'javascriptreact')
+
+-- Activate treesitter for supported filetypes.
+-- Wrapped in pcall so that a missing parser (e.g. before the first
+-- :TSUpdate has finished) never crashes startup with an error.
 vim.api.nvim_create_autocmd('FileType', {
-    pattern = { 'rust', 'c', 'cpp', 'lua', 'python' },
+    pattern = {
+      -- systems / scripting
+      'rust', 'c', 'cpp', 'lua', 'python',
+      -- web / JS / TS / React
+      'javascript', 'javascriptreact',
+      'typescript', 'typescriptreact',
+      'html', 'css', 'json',
+    },
     callback = function()
-      -- syntax highlighting, provided by Neovim
-      vim.treesitter.start()
-      -- folds, provided by Neovim
-      -- vim.wo.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
-      -- vim.wo.foldmethod = 'expr'
-      -- indentation, provided by nvim-treesitter
+      local ok, err = pcall(vim.treesitter.start)
+      if not ok then
+        vim.notify(
+          'treesitter parser not yet installed for this filetype: ' .. err,
+          vim.log.levels.DEBUG
+        )
+        return
+      end
       vim.bo.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
     end,
   })
-

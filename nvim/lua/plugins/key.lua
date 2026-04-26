@@ -15,6 +15,11 @@ return { -- Useful plugin to show you pending keybinds.
         { '<leader>t', group = '[T]oggle' },
         { '<leader>h', group = 'Git [H]unk', mode = { 'n', 'v' } }, -- Enable gitsigns recommended keymaps first
         { 'gr', group = 'LSP Actions', mode = { 'n' } },
+
+        -- <gc> is the comment *operator* (e.g. gcap, gcG) while <gcc> is the
+        -- line-comment shortcut. Both are intentional; registering <gc> as a
+        -- group here tells which-key they are not an accidental overlap.
+        { 'gc', group = 'Comment', mode = { 'n', 'v' } },
       },
     },
   }
