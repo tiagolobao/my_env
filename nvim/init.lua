@@ -80,3 +80,9 @@ vim.api.nvim_create_autocmd('FileType', {
       vim.bo.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
     end,
   })
+
+-- Add custom trim whitespaces command
+vim.api.nvim_create_user_command("TrimWhitespaces", function()
+  vim.cmd([[keeppatterns %s/\s\+$//e]])
+end, {})
+
