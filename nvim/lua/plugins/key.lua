@@ -11,10 +11,11 @@ return { -- Useful plugin to show you pending keybinds.
 
       -- Document existing key chains
       spec = {
+        { '<leader>f', group = '[F]ind (fzf-lua)', mode = { 'n' } },
         { '<leader>s', group = '[S]earch', mode = { 'n', 'v' } },
         { '<leader>t', group = '[T]oggle' },
-        { '<leader>h', group = 'Git [H]unk', mode = { 'n', 'v' } }, -- Enable gitsigns recommended keymaps first
-        { 'gr', group = 'LSP Actions', mode = { 'n' } },
+        { '<leader>h', group = 'Git [H]unk', mode = { 'n', 'v' } },
+        { 'gr',        group = 'LSP Actions', mode = { 'n' } },
 
         -- <gc> is the comment *operator* (e.g. gcap, gcG) while <gcc> is the
         -- line-comment shortcut. Both are intentional; registering <gc> as a
