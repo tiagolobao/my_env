@@ -12,3 +12,8 @@
 [merge]
     conflictStyle = zdiff3
 
+[user]
+	email = tiago.blobao@gmail.com
+	name = Tiago Lobao
+[init]
+	defaultBranch = main

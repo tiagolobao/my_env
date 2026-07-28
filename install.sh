@@ -52,6 +52,20 @@ create_symlink() {
     echo "Created symlink: $target -> $source"
 }
 
+add_to_bashrc() {
+    local pattern="$1"
+    local line="$2"
+    local comment="$3"
+    if ! grep -q "$pattern" "$HOME/.bashrc" 2>/dev/null; then
+        echo "" >> "$HOME/.bashrc"
+        [ -n "$comment" ] && echo "$comment" >> "$HOME/.bashrc"
+        echo "$line" >> "$HOME/.bashrc"
+        echo "Added '$line' to ~/.bashrc"
+    else
+        echo "'$line' already present in ~/.bashrc"
+    fi
+}
+
 # Parse arguments
 while [ $# -gt 0 ]; do
     case "$1" in
@@ -93,11 +107,6 @@ echo ""
 echo "=== Installing Bash aliases ==="
 create_symlink "$SCRIPT_DIR/bash/.bash_aliases" "$HOME/.bash_aliases"
 
-# Install Aider configuration
-# echo ""
-# echo "=== Installing Aider configuration ==="
-# create_symlink "$SCRIPT_DIR/.aider.conf.yml" "$HOME/.aider.conf.yml"
-
 # Install Git configuration
 echo ""
 echo "=== Installing Git configuration ==="
@@ -106,14 +115,9 @@ create_symlink "$SCRIPT_DIR/git/.gitconfig" "$HOME/.gitconfig"
 # Source bash aliases in .bashrc if not already present
 echo ""
 echo "=== Updating .bashrc ==="
-BASH_ALIASES_SOURCE="[ -f ~/.bash_aliases ] && source ~/.bash_aliases"
-if ! grep -q "source ~/.bash_aliases" "$HOME/.bashrc" 2>/dev/null; then
-    echo "" >> "$HOME/.bashrc"
-    echo "# Source custom bash aliases" >> "$HOME/.bashrc"
-    echo "$BASH_ALIASES_SOURCE" >> "$HOME/.bashrc"
-    echo "Added bash aliases sourcing to ~/.bashrc"
-else
-    echo "Bash aliases sourcing already present in ~/.bashrc"
-fi
+add_to_bashrc "source ~/.bash_aliases" \
+    "[ -f ~/.bash_aliases ] && source ~/.bash_aliases" \
+    "# Source custom bash aliases"
+add_to_bashrc "export EDITOR=" "export EDITOR=nvim" "# Set default editor"
 
 echo "=== Installation complete! ==="

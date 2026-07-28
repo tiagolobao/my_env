@@ -18,7 +18,6 @@ These configurations are tailored to provide a productive, consistent, and visua
 - `kitty/` – Kitty terminal configuration (kitty.conf, themes)
 - `bash/` – Bash startup scripts (`.bashrc`, `.bash_profile`, aliases)
 - `install.sh` – Installation script for Linux environments
-- `.aider.conf.yml` – Configuration for Aider AI coding assistant
 
 ## Quick Start
 
